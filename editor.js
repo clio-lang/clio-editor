@@ -60,6 +60,9 @@ function save_file(filename, data) {
 jQuery.fn.extend({
   clio_editor: function() {
     function colorize_text(text) {
+      if (!text.endsWith('\n')) {
+        text = text + '\n'
+      }
       var colorized = $('<div>');
       var patterns = [
         {pattern: /^fn +[a-z_][a-z_0-9]*/i, action: function (match, elems) {
@@ -127,7 +130,8 @@ jQuery.fn.extend({
       var text = el.text();
       var pos = el.caret('pos');
       var colorized = colorize_text(text);
-      el.html(colorized.html());
+      var new_text = colorized.html();
+      el.html(new_text);
       el.caret('pos', pos);
     }
     function line_numbers(el) {
@@ -142,10 +146,15 @@ jQuery.fn.extend({
     function insert_newline(el) {
       var pos = el.caret('pos');
       var text = el.text();
-      var text = text.slice(0, pos) + '\n' + text.slice(pos);
-      var colorized = colorize_text(text);
-      el.html(colorized.html());
-      el.caret('pos', pos+1);
+      var new_text = text.slice(0, pos) + '\n' + text.slice(pos);
+      var colorized = colorize_text(new_text);
+      var new_text = colorized.html();
+      el.html(new_text);
+      // caret should never be == text length
+      if (pos == text.length) {
+        pos -= 1
+      }
+      el.caret('pos', pos + 1);
     }
     function insert_tab(el) {
       var pos = el.caret('pos');
@@ -390,27 +399,7 @@ jQuery.fn.extend({
           var text = elem.text();
           var word = text.slice(pos-2, pos);
 
-          if (word == '->') {
-            text = text.slice(0, pos-2) + '→' + text.slice(pos);
-            var colorized = colorize_text(text);
-            elem.html(colorized.html());
-            elem.caret('pos', pos-1);
-          } else if (word == '=>') {
-            text = text.slice(0, pos-2) + '⇒' + text.slice(pos);
-            var colorized = colorize_text(text);
-            elem.html(colorized.html());
-            elem.caret('pos', pos-1);
-          } else if (word == '>=') {
-            text = text.slice(0, pos-2) + '≥' + text.slice(pos);
-            var colorized = colorize_text(text);
-            elem.html(colorized.html());
-            elem.caret('pos', pos-1);
-          } else if (word == '=<') {
-            text = text.slice(0, pos-2) + '≤' + text.slice(pos);
-            var colorized = colorize_text(text);
-            elem.html(colorized.html());
-            elem.caret('pos', pos-1);
-          }*/
+          */
 
         } else if (e.which == 13) {
           e.preventDefault();
